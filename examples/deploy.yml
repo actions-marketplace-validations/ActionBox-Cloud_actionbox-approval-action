@@ -1,0 +1,26 @@
+name: Deploy after human approval
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ask a reviewer to approve the deployment
+        id: approval
+        uses: ActionBox-Cloud/actionbox-approval-action@v1
+        with:
+          token: ${{ secrets.ACTIONBOX_SOURCE_KEY }}
+          title: Approve production deployment
+          description: Review commit ${{ github.sha }} before deployment.
+          context-json: '[{"type":"key_value","items":{"environment":"production","commit":"${{ github.sha }}"}}]'
+          timeout: "3600"
+      - name: Continue only after approval
+        if: steps.approval.outputs.decision == 'approve'
+        run: echo "Approved. Replace this step with your deployment command."

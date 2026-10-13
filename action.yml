@@ -1,0 +1,55 @@
+name: ActionBox Human Approval Gate
+description: Request a human decision through ActionBox before a GitHub Actions job continues.
+branding:
+  icon: check-circle
+  color: purple
+inputs:
+  token:
+    description: ActionBox Source key stored in a GitHub Actions secret
+    required: true
+  title:
+    description: Title shown to the reviewer
+    required: true
+  description:
+    description: Additional context shown to the reviewer
+    required: false
+    default: ""
+  context-json:
+    description: Optional array of ActionBox context blocks as JSON
+    required: false
+    default: ""
+  timeout:
+    description: Maximum time to wait for a human decision in seconds (1–21600)
+    required: false
+    default: "3600"
+outputs:
+  action-id:
+    description: The created ActionBox Action ID
+    value: ${{ steps.create.outputs.action_id }}
+  decision:
+    description: The human's option ID (approve on success)
+    value: ${{ steps.wait.outputs.decision }}
+  status:
+    description: The terminal Action status (resolved on success)
+    value: ${{ steps.wait.outputs.status }}
+runs:
+  using: composite
+  steps:
+    - id: create
+      shell: bash
+      env:
+        ACTIONBOX_TOKEN: ${{ inputs.token }}
+        ACTIONBOX_TITLE: ${{ inputs.title }}
+        ACTIONBOX_DESCRIPTION: ${{ inputs.description }}
+        ACTIONBOX_CONTEXT_JSON: ${{ inputs.context-json }}
+        ACTIONBOX_TIMEOUT: ${{ inputs.timeout }}
+      run: bash "$GITHUB_ACTION_PATH/scripts/create.sh"
+    - id: wait
+      shell: bash
+      env:
+        ACTIONBOX_TOKEN: ${{ inputs.token }}
+        ACTIONBOX_ACTION_ID: ${{ steps.create.outputs.action_id }}
+        ACTIONBOX_ACTION_VERSION: ${{ steps.create.outputs.action_version }}
+        ACTIONBOX_FINGERPRINT: ${{ steps.create.outputs.fingerprint }}
+        ACTIONBOX_TIMEOUT: ${{ inputs.timeout }}
+      run: bash "$GITHUB_ACTION_PATH/scripts/wait.sh"
