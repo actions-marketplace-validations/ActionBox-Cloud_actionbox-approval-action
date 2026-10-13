@@ -10,7 +10,7 @@ This repository contains only the integration wrapper. ActionBox is a proprietar
 2. Save that key as the GitHub Actions repository secret `ACTIONBOX_SOURCE_KEY`.
 3. Add the gate after the checks that should run before review. Use a trusted event such as `workflow_dispatch`; do not expose the Source key to untrusted pull-request code.
 
-After the standalone repository and `v1` release are published, the workflow can use:
+Use the published `v1` action in your workflow:
 
 ```yaml
 - name: Request approval
@@ -52,4 +52,4 @@ This composite action **keeps a runner occupied while it waits**. GitHub environ
 
 ## Availability
 
-This folder is the canonical source for a proposed standalone public action. The `ActionBox-Cloud/actionbox-approval-action@v1` reference above is a **post-release example**, not a currently published tag or Marketplace listing. Until that release is verified, use the [hosted API workflow](https://actionbox.cloud/docs/github-action) documented on the ActionBox site. The integration wrapper can be MIT-licensed without changing the hosted service's proprietary status.
+This folder is the canonical source for the [public ActionBox GitHub Action](https://github.com/ActionBox-Cloud/actionbox-approval-action), which is also listed on GitHub Marketplace. Use `@v1` for the published major version or pin a reviewed full commit SHA. The integration wrapper is MIT-licensed; ActionBox remains a proprietary hosted service.
